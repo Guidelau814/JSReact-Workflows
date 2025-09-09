@@ -1,0 +1,23 @@
+name: Build JSReact
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+
+      - name: Installation de npm
+        run: npm install
+
+      - name: Build de npm
+        run: npm run build
+
+      - name: Lancer le serveur en arrière-plan
+        run: |
+          nohup npm start > server.log 2>&1 &
+          echo $! > server.pid
+          sleep 5
+          curl -f http://localhost:3000 || (tail -n 50 server.log && exit 1)
